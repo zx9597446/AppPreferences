@@ -32,6 +32,13 @@
 	AppPreferences.prototype.remove = function(keyToRemove, success,fail) {
 	    cordova.exec(success,fail,"applicationPreferences","remove", [keyToRemove]);    
 	};
+	
+	AppPreferences.prototype.getByName = function(cfgName, pkgName, key, success, fail) {
+		cordova.exec(success, fail, "applicationPreferences", "getByName", [cfgName, pkgName, key]);
+	}
+	AppPreferences.prototype.setByName = function(cfgName, key, value, success, fail) {
+		cordova.exec(success, fail, "applicationPreferences", "setByName", [cfgName, key, value]);
+	}
 
 	var appPreferences = new AppPreferences();
 	module.exports = appPreferences;

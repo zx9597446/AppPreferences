@@ -42,7 +42,32 @@ public class AppPreferences extends CordovaPlugin {
                 } else {
                     callbackContext.sendPluginResult(createErrorObj(NO_PROPERTY, "No such property called " + key));
                 }
-            } else if (action.equals("set")) {
+            } else if (action.equals("getByName")) {
+                String cfgName = args.getString(0);
+                String pkgName = args.getString(1);
+                String key = args.getString(2);
+				Context otherAppsContext = createPackageContext(pkgName, Context.CONTEXT_IGNORE_SECURITY);
+				SharedPreferences sp = otherAppsContext.getSharedPreferences(cfgName, Context.MODE_WORLD_READABLE);
+                if (sp.contains(key)) {
+                    Object obj = sp.getAll().get(key);
+                    callbackContext.sendPluginResult(new PluginResult(status, obj.toString()));
+                } else {
+                    callbackContext.sendPluginResult(createErrorObj(NO_PROPERTY, "No such property called " + key));
+                }
+					
+			} else if (action.equals("setByName")) {
+				String name = args.getString(0);
+				SharedPreferences sp = getSharedPreferences(name, Context.CONTEXT_IGNORE_SECURITY);  
+                String key = args.getString(1);
+                String value = args.getString(2);               
+                Editor editor = sp.edit();
+                if ("true".equals(value.toLowerCase()) || "false".equals(value.toLowerCase())) {
+                    editor.putBoolean(key, Boolean.parseBoolean(value));
+                } else {
+                    editor.putString(key, value);
+                }
+                callbackContext.sendPluginResult(new PluginResult(status, editor.commit()));               
+			} else if (action.equals("set")) {
                 String key = args.getString(0);
                 String value = args.getString(1);               
                 Editor editor = sharedPrefs.edit();
