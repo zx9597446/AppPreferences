@@ -57,3 +57,7 @@ Sample use:
 	});
 
 
+added two methods for get other package's preferences:
+setByName(configName, key, value, success, fail)
+getByName(configName, packageName, key, success, fail)
+useful for share data between two apps.
