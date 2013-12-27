@@ -14,8 +14,10 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.Context;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.content.pm.PackageManager.NameNotFoundException;  
 
 public class AppPreferences extends CordovaPlugin {
 
@@ -32,6 +34,7 @@ public class AppPreferences extends CordovaPlugin {
         String result = "";
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this.cordova.getActivity());
+		Context appCtx = this.cordova.getActivity().getApplicationContext();
 
         try {
             if (action.equals("get")) {
@@ -46,7 +49,7 @@ public class AppPreferences extends CordovaPlugin {
                 String cfgName = args.getString(0);
                 String pkgName = args.getString(1);
                 String key = args.getString(2);
-				Context otherAppsContext = createPackageContext(pkgName, Context.CONTEXT_IGNORE_SECURITY);
+				Context otherAppsContext = appCtx.createPackageContext(pkgName, Context.CONTEXT_IGNORE_SECURITY);
 				SharedPreferences sp = otherAppsContext.getSharedPreferences(cfgName, Context.MODE_WORLD_READABLE);
                 if (sp.contains(key)) {
                     Object obj = sp.getAll().get(key);
@@ -57,7 +60,7 @@ public class AppPreferences extends CordovaPlugin {
 					
 			} else if (action.equals("setByName")) {
 				String name = args.getString(0);
-				SharedPreferences sp = getSharedPreferences(name, Context.CONTEXT_IGNORE_SECURITY);  
+				SharedPreferences sp = appCtx.getSharedPreferences(name, Context.MODE_WORLD_READABLE);  
                 String key = args.getString(1);
                 String value = args.getString(2);               
                 Editor editor = sp.edit();
@@ -105,7 +108,9 @@ public class AppPreferences extends CordovaPlugin {
             return true;
         } catch (JSONException e) {
             status = PluginResult.Status.JSON_EXCEPTION;
-        }
+        } catch (NameNotFoundException e) {  
+            status = PluginResult.Status.ERROR;
+		}
         callbackContext.sendPluginResult(new PluginResult(status, result));
         return false;
     }
